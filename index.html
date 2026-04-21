@@ -44,8 +44,8 @@
 
         /* حاوية الصورة المرفوعة */
         .abeer-img-container {
-            width: 250px;
-            height: 250px;
+            width: 350px;
+            height: 350px;
             margin: 0 auto 20px;
             position: relative;
         }
@@ -225,7 +225,7 @@
         const n = document.getElementById('num-teams').value;
         const area = document.getElementById('input-area');
         area.innerHTML = '';
-        for(let i=1; i<=n; i++) area.innerHTML += `<input type="text" id="t-${i}" placeholder="اسم الفريق ${i}" value=" الفريق الأول ${i}">`;
+        for(let i=1; i<=n; i++) area.innerHTML += `<input type="text" id="t-${i}" placeholder="اسم الفريق ${i}" value=" الفريق  ${i}">`;
     }
     createInputs();
 
@@ -233,7 +233,7 @@
         const n = document.getElementById('num-teams').value;
         teams = [];
         for(let i=1; i<=n; i++) {
-            let name = document.getElementById(`t-${i}`).value || `الفريق الثاني ${i}`;
+            let name = document.getElementById(`t-${i}`).value || `الفريق  ${i}`;
             teams.push({ name: name, score: 0 });
         }
         render();
