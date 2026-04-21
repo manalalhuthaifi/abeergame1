@@ -649,21 +649,7 @@ function ask(idx) {
             showAns();
         }
     }, 1000);
-}
 
-    let time = 20;
-    const bar = document.getElementById('timer-progress');
-    bar.style.width = '100%';
-    clearInterval(clock);
-
-    clock = setInterval(() => {
-        time--;
-        bar.style.width = (time / 20) * 100 + '%';
-        if (time <= 0) {
-            clearInterval(clock);
-            showAns();
-        }
-    }, 1000);
 }
 
 function showAns() {
