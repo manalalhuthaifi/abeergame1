@@ -623,13 +623,33 @@ function showScreen(id) {
 function ask(idx) {
     used.push(idx);
     const item = DATA[idx];
+
+    const randomQuestion = item.items[Math.floor(Math.random() * item.items.length)];
+
     document.getElementById('current-letter').innerText = item.l;
-    document.getElementById('q-text').innerText = item.q;
-    document.getElementById('ans-box').innerText = "الإجابة الصحيحة: " + item.a;
+    document.getElementById('q-text').innerText = randomQuestion.q;
+    document.getElementById('ans-box').innerText = "الإجابة الصحيحة: " + randomQuestion.a;
+
     document.getElementById('ans-box').classList.add('hidden');
     document.getElementById('q-controls').classList.remove('hidden');
     document.getElementById('grade-controls').classList.add('hidden');
+
     showScreen('screen-question');
+
+    let time = 20;
+    const bar = document.getElementById('timer-progress');
+    bar.style.width = '100%';
+    clearInterval(clock);
+
+    clock = setInterval(() => {
+        time--;
+        bar.style.width = (time / 20) * 100 + '%';
+        if (time <= 0) {
+            clearInterval(clock);
+            showAns();
+        }
+    }, 1000);
+}
 
     let time = 20;
     const bar = document.getElementById('timer-progress');
