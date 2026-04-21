@@ -226,7 +226,7 @@
         const n = document.getElementById('num-teams').value;
         const area = document.getElementById('input-area');
         area.innerHTML = '';
-        for(let i=1; i<=n; i++) area.innerHTML += `<input type="text" id="t-${i}" placeholder="اسم الطليعة ${i}" value="طليعة ${i}">`;
+        for(let i=1; i<=n; i++) area.innerHTML += `<input type="text" id="t-${i}" placeholder="اسم الفريق ${i}" value="الفريق الأول ${i}">`;
     }
     createInputs();
 
@@ -234,7 +234,7 @@
         const n = document.getElementById('num-teams').value;
         teams = [];
         for(let i=1; i<=n; i++) {
-            let name = document.getElementById(`t-${i}`).value || `طليعة ${i}`;
+            let name = document.getElementById(`t-${i}`).value || `الفريق الثاني ${i}`;
             teams.push({ name: name, score: 0 });
         }
         render();
