@@ -467,7 +467,7 @@ function showScreen(id) {
         const n = document.getElementById('num-teams').value;
         teams = [];
         for (let i = 1; i <= n; i++) {
-            let name = document.getElementById(\`t-\${i}\`).value || \`الفريق \${i}\`;
+            let name = document.getElementById('t-' + i).value || 'الفريق ' + i;
             teams.push({ name: name, score: 0 });
         }
         used = [];
@@ -476,78 +476,83 @@ function showScreen(id) {
         showScreen('screen-letters');
     }
 
-    function render() {
-        const bar = document.getElementById('status-bar');
-        bar.innerHTML = '';
-        teams.forEach((t, i) => {
-            bar.innerHTML += \`<div class="team-box \${i===turn?'active':''}"><b>\${t.name}</b><br>\${t.score} نقطة</div>\`;
-        });
+   function render() {
+    const bar = document.getElementById('status-bar');
+    bar.innerHTML = '';
 
-        document.getElementById('turn-text').innerText = \`الآن دور: \${teams[turn].name} (اختر حرفاً)\`;
+    teams.forEach((t, i) => {
+        bar.innerHTML += '<div class="team-box ' + (i === turn ? 'active' : '') + '"><b>' + t.name + '</b><br>' + t.score + ' نقطة</div>';
+    });
 
-        const grid = document.getElementById('letters-grid');
-        grid.innerHTML = '';
-        DATA.forEach((item, idx) => {
-            const btn = document.createElement('div');
-            btn.className = 'letter-btn' + (used.includes(idx) ? ' disabled' : '');
-            btn.innerText = item.l;
-            if (!used.includes(idx)) btn.onclick = () => ask(idx);
-            grid.appendChild(btn);
-        });
-    }
+    document.getElementById('turn-text').innerText = 'الآن دور: ' + teams[turn].name + ' (اختر حرفاً)';
 
-    function ask(idx) {
-        used.push(idx);
-        const item = DATA[idx];
-        document.getElementById('current-letter').innerText = item.l;
-        document.getElementById('q-text').innerText = item.q;
-        document.getElementById('ans-box').innerText = "الإجابة الصحيحة: " + item.a;
-        document.getElementById('ans-box').classList.add('hidden');
-        document.getElementById('q-controls').classList.remove('hidden');
-        document.getElementById('grade-controls').classList.add('hidden');
-        showScreen('screen-question');
+    const grid = document.getElementById('letters-grid');
+    grid.innerHTML = '';
 
-        let time = 20;
-        const bar = document.getElementById('timer-progress');
-        bar.style.width = '100%';
-        clearInterval(clock);
-        clock = setInterval(() => {
-            time--;
-            bar.style.width = (time / 20) * 100 + '%';
-            if (time <= 0) {
-                clearInterval(clock);
-                showAns();
-            }
-        }, 1000);
-    }
+    DATA.forEach((item, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'letter-btn' + (used.includes(idx) ? ' disabled' : '');
+        btn.innerText = item.l;
+        if (!used.includes(idx)) btn.onclick = () => ask(idx);
+        grid.appendChild(btn);
+    });
+}
 
-    function showAns() {
-        clearInterval(clock);
-        document.getElementById('ans-box').classList.remove('hidden');
-        document.getElementById('q-controls').classList.add('hidden');
-        document.getElementById('grade-controls').classList.remove('hidden');
-    }
+function ask(idx) {
+    used.push(idx);
+    const item = DATA[idx];
+    document.getElementById('current-letter').innerText = item.l;
+    document.getElementById('q-text').innerText = item.q;
+    document.getElementById('ans-box').innerText = "الإجابة الصحيحة: " + item.a;
+    document.getElementById('ans-box').classList.add('hidden');
+    document.getElementById('q-controls').classList.remove('hidden');
+    document.getElementById('grade-controls').classList.add('hidden');
+    showScreen('screen-question');
 
-    function handleResult(isWin) {
-        if (isWin) teams[turn].score += 10;
-        turn = (turn + 1) % teams.length;
-        if (used.length === DATA.length) {
-            end();
-        } else {
-            render();
-            showScreen('screen-letters');
+    let time = 20;
+    const bar = document.getElementById('timer-progress');
+    bar.style.width = '100%';
+    clearInterval(clock);
+
+    clock = setInterval(() => {
+        time--;
+        bar.style.width = (time / 20) * 100 + '%';
+        if (time <= 0) {
+            clearInterval(clock);
+            showAns();
         }
-    }
+    }, 1000);
+}
 
-    function end() {
-        showScreen('screen-end');
-        const s = [...teams].sort((a,b)=>b.score-a.score);
-        document.getElementById('final-results').innerHTML = s.map((t, idx) => \`
-            <p style="font-weight: \${idx===0?'900':'normal'}; color: \${idx===0?'var(--accent)':'var(--forest)'}">
-                \${idx===0?'🥇':''} \${t.name}: \${t.score} نقطة
-            </p>
-        \`).join('');
+function showAns() {
+    clearInterval(clock);
+    document.getElementById('ans-box').classList.remove('hidden');
+    document.getElementById('q-controls').classList.add('hidden');
+    document.getElementById('grade-controls').classList.remove('hidden');
+}
+
+function handleResult(isWin) {
+    if (isWin) teams[turn].score += 10;
+    turn = (turn + 1) % teams.length;
+
+    if (used.length === DATA.length) {
+        end();
+    } else {
+        render();
+        showScreen('screen-letters');
     }
+}
+
+function end() {
+    showScreen('screen-end');
+    const s = [...teams].sort((a, b) => b.score - a.score);
+
+    document.getElementById('final-results').innerHTML = s.map((t, idx) =>
+        '<p style="font-weight: ' + (idx === 0 ? '900' : 'normal') +
+        '; color: ' + (idx === 0 ? 'var(--accent)' : 'var(--forest)') + '">' +
+        (idx === 0 ? '🥇 ' : '') + t.name + ': ' + t.score + ' نقطة</p>'
+    ).join('');
+}
 </script>
 </body>
 </html>
