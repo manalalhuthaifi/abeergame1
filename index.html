@@ -11,80 +11,67 @@
 body{
     margin:0;
     font-family:'Cairo';
-    background:#e8f5e9;
     overflow:hidden;
+    background:#e8f5e9;
 }
 
-/* الخلفية */
+/* شاشة البداية */
 #screen-start{
-    position:fixed;
+    position:absolute;
     inset:0;
     display:flex;
     justify-content:center;
     align-items:center;
+    text-align:center;
+    color:white;
     background:url("./assets/bg.jpg") center/cover no-repeat;
 }
 
-/* طبقة تغميق */
 #screen-start::before{
     content:"";
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,0.5);
+    background:rgba(0,0,0,0.6);
 }
 
-/* محتوى */
-.start-box{
+#screen-start *{
     position:relative;
     z-index:2;
-    display:flex;
-    gap:40px;
-    align-items:center;
-    width:90%;
-    max-width:1100px;
 }
 
-/* الشخصية */
-.character{
-    width:300px;
-    animation:float 3s infinite ease-in-out;
-}
-
-@keyframes float{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-15px)}
-}
-
-/* النص */
-.text{
-    color:white;
-    text-align:right;
-}
-
-.text h1{
+h1{
     font-size:3rem;
 }
 
-.text h2{
+h2{
     font-size:1.5rem;
 }
 
-/* زر */
 button{
     padding:15px 35px;
-    font-size:1.3rem;
+    font-size:1.5rem;
     border:none;
     border-radius:40px;
     background:#2e7d32;
     color:white;
     cursor:pointer;
-    margin-top:15px;
+    margin-top:20px;
 }
 
-/* باقي الشاشات */
+.character{
+    width:200px;
+    margin-bottom:15px;
+}
+
+/* باقي اللعبة */
 .screen{
     display:none;
-    padding:20px;
+    background:white;
+    padding:30px;
+    border-radius:25px;
+    max-width:900px;
+    margin:auto;
+    margin-top:50px;
     text-align:center;
 }
 
@@ -92,10 +79,11 @@ button{
 
 .letter{
     display:inline-block;
-    font-size:2rem;
+    font-size:2.5rem;
     padding:15px;
     margin:10px;
-    border:2px solid green;
+    border:2px solid #2e7d32;
+    border-radius:15px;
     cursor:pointer;
 }
 </style>
@@ -105,98 +93,61 @@ button{
 
 <!-- البداية -->
 <div id="screen-start">
-  <div class="start-box">
-
-    <!-- الشخصية يسار -->
-    <img src="./assets/abeer.png" class="character">
-
-    <!-- النص يمين -->
-    <div class="text">
-      <h1>مغامرات الكشافة عبير</h1>
-      <h2>تحدي الحروف الكشفية</h2>
-      <button onclick="showScreen('setup')">ابدأ المغامرة</button>
+    <div>
+        <img src="./assets/abeer.png" class="character">
+        <h1>مغامرات الكشافة عبير</h1>
+        <h2>تحدي الحروف الكشفية</h2>
+        <button onclick="startGame()">ابدأ اللعب ▶</button>
     </div>
-
-  </div>
-</div>
-
-<!-- الإعداد -->
-<div id="setup" class="screen">
-  <h2>عدد الفرق</h2>
-  <input id="num" type="number" value="2">
-  <div id="inputs"></div>
-  <button onclick="startGame()">ابدأ اللعب</button>
 </div>
 
 <!-- اللعب -->
 <div id="game" class="screen">
-  <h2 id="turn"></h2>
-  <div id="letters"></div>
+    <h2 id="turn"></h2>
+    <div id="letters"></div>
 </div>
 
 <!-- السؤال -->
 <div id="question" class="screen">
-  <h1 id="letter"></h1>
-  <h2 id="q"></h2>
-  <button onclick="showAns()">إظهار الإجابة</button>
-  <p id="ans" style="display:none"></p>
-  <button onclick="answer(true)">صح</button>
-  <button onclick="answer(false)">خطأ</button>
+    <h1 id="letter"></h1>
+    <h2 id="q"></h2>
+    <button onclick="showAnswer()">كشف الإجابة</button>
+    <div id="answer" style="display:none;margin-top:20px"></div>
+    <button onclick="result(true)">صح</button>
+    <button onclick="result(false)">خطأ</button>
 </div>
 
 <!-- النهاية -->
 <div id="end" class="screen">
-  <h1>النهاية</h1>
-  <div id="result"></div>
+    <h1>🏆 انتهت اللعبة</h1>
+    <div id="result"></div>
 </div>
 
 <script>
-let data=[
+const data = [
 {l:"أ",q:"أول خطوة إسعاف؟",a:"تأمين المكان"},
 {l:"ب",q:"أداة اتجاه؟",a:"البوصلة"},
 {l:"ج",q:"تنظيف الجرح؟",a:"ماء"}
 ];
 
-let teams=[];
+let teams=[
+{name:"الفريق 1",score:0},
+{name:"الفريق 2",score:0}
+];
+
 let turn=0;
 let used=[];
 
-/* تغيير الشاشة */
-function showScreen(id){
-document.getElementById("screen-start").style.display="none";
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-
-if(id==="setup") createInputs();
-}
-
-/* إنشاء مدخلات */
-function createInputs(){
-let n=document.getElementById("num").value;
-let html="";
-for(let i=1;i<=n;i++){
-html+=`<input id="t-${i}" placeholder="الفريق ${i}">`;
-}
-document.getElementById("inputs").innerHTML=html;
-}
-
-/* بدء اللعبة */
+/* إصلاح زر البداية */
 function startGame(){
-let n=document.getElementById("num").value;
-teams=[];
-
-for(let i=1;i<=n;i++){
-let name=document.getElementById('t-'+i).value || 'الفريق '+i;
-teams.push({name:name,score:0});
-}
-
-showScreen("game");
+document.getElementById("screen-start").style.display="none";
+document.getElementById("game").classList.add("active");
 render();
 }
 
 /* عرض الحروف */
 function render(){
-document.getElementById("turn").innerText="الدور: "+teams[turn].name;
+document.getElementById("turn").innerText="دور: "+teams[turn].name;
 
 let html="";
 data.forEach((d,i)=>{
@@ -207,43 +158,45 @@ html+=`<div class="letter" onclick="ask(${i})">${d.l}</div>`;
 document.getElementById("letters").innerHTML=html;
 }
 
-/* سؤال */
+/* السؤال */
 function ask(i){
 used.push(i);
 let d=data[i];
 
-showScreen("question");
+document.getElementById("game").classList.remove("active");
+document.getElementById("question").classList.add("active");
 
 document.getElementById("letter").innerText=d.l;
 document.getElementById("q").innerText=d.q;
-document.getElementById("ans").innerText=d.a;
-document.getElementById("ans").style.display="none";
+document.getElementById("answer").innerText=d.a;
 }
 
 /* إظهار الإجابة */
-function showAns(){
-document.getElementById("ans").style.display="block";
+function showAnswer(){
+document.getElementById("answer").style.display="block";
 }
 
 /* النتيجة */
-function answer(correct){
-if(correct) teams[turn].score+=10;
+function result(win){
+if(win) teams[turn].score+=10;
 
 turn=(turn+1)%teams.length;
 
 if(used.length===data.length){
 endGame();
 }else{
-showScreen("game");
+document.getElementById("question").classList.remove("active");
+document.getElementById("game").classList.add("active");
 render();
 }
 }
 
 /* النهاية */
 function endGame(){
-showScreen("end");
+document.getElementById("question").classList.remove("active");
+document.getElementById("end").classList.add("active");
 
-let res=teams.map(t=>t.name+" : "+t.score).join("<br>");
+let res=teams.map(t=>t.name+": "+t.score).join("<br>");
 document.getElementById("result").innerHTML=res;
 }
 </script>
