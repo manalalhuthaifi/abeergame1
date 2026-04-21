@@ -1,223 +1,675 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مغامرات مس عبير</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مغامرات مس عبير - تحدي الحروف الكشفية</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        :root {
+            --primary: #2e7d32;
+            --secondary: #ffca28;
+            --accent: #e65100;
+            --white: #ffffff;
+            --bg-light: #f1f8e9;
+            --forest: #1b5e20;
+            --danger: #c62828;
+            --danger-dark: #8e0000;
+        }
 
-:root{
---primary:#2e7d32;
---secondary:#ffca28;
---accent:#e65100;
---bg:#f1f8e9;
---forest:#1b5e20;
---danger:#c62828;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+        }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+        body {
+            background-color: var(--bg-light);
+            overflow: hidden;
+            height: 100vh;
+        }
 
-body{
-background:var(--bg);
-height:100vh;
-overflow:hidden;
-}
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
 
-.screen{
-display:none;
-background:#fff;
-border-radius:30px;
-padding:20px;
-max-width:1100px;
-width:100%;
-margin:auto;
-border:6px solid var(--primary);
-text-align:center;
-}
+        #ui-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 18px;
+        }
 
-.screen.active{display:block;}
+        .screen {
+            display: none;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 24px 28px 34px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 1100px;
+            width: 100%;
+            border: 8px solid var(--primary);
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: calc(100vh - 36px);
+            overflow-y: auto;
+        }
 
-h1{font-size:3rem;color:var(--forest);}
-h2{color:var(--accent);}
+        .screen.active {
+            display: block;
+        }
 
-button{
-background:linear-gradient(135deg,var(--primary),var(--forest));
-color:white;
-border:none;
-padding:15px 30px;
-border-radius:40px;
-font-size:1.2rem;
-cursor:pointer;
-margin:8px;
-}
+        @keyframes slideUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-.end-btn{
-background:linear-gradient(135deg,var(--danger),#8e0000);
-}
+        h1 {
+            color: var(--forest);
+            font-size: 3.2rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 0 var(--secondary);
+            margin-bottom: 10px;
+            line-height: 1.15;
+        }
 
-.start-layout{
-display:grid;
-grid-template-columns:1fr 1fr;
-align-items:center;
-gap:10px;
-padding:10px;
-}
+        h2 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin-bottom: 18px;
+        }
 
-/* تكبير الشخصية */
-.abeer-img{
-width:100%;
-max-width:500px;
-height:auto;
-display:block;
-margin:auto;
-}
+        /* شاشة البداية */
+        #screen-start {
+            padding: 14px 22px 20px;
+            overflow: hidden;
+        }
 
-/* شبكة الحروف */
-.letters-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(90px,1fr));
-gap:15px;
-margin-top:20px;
-}
+        .start-layout {
+            display: grid;
+            grid-template-columns: 0.95fr 1.05fr;
+            align-items: center;
+            gap: 10px;
+            min-height: min(700px, calc(100vh - 90px));
+        }
 
-.letter-btn{
-font-size:2.5rem;
-border:3px solid var(--primary);
-border-radius:15px;
-padding:10px;
-cursor:pointer;
-}
+        .start-text {
+            text-align: right;
+            padding: 8px 8px 8px 16px;
+        }
 
-.hidden{display:none;}
-</style>
+        .start-text p {
+            font-size: 1.2rem;
+            color: #48654a;
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .start-actions {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .abeer-side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .abeer-img-container {
+            width: 100%;
+            max-width: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            animation: floatAbeer 3s infinite ease-in-out;
+        }
+
+        .abeer-img {
+            width: 90%;
+            max-width: 520px;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.25));
+            display: block;
+        }
+
+        @keyframes floatAbeer {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-14px) rotate(2deg); }
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--forest));
+            color: white;
+            border: none;
+            padding: 16px 34px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 0 #0a3d0d;
+            margin: 6px;
+        }
+
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 0 #0a3d0d;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #0a3d0d;
+        }
+
+        .danger-btn {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            box-shadow: 0 8px 0 #5d0000;
+        }
+
+        .danger-btn:hover {
+            box-shadow: 0 12px 0 #5d0000;
+        }
+
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 18px;
+            margin: 26px 0;
+        }
+
+        .letter-btn {
+            background: var(--white);
+            border: 4px solid var(--primary);
+            border-radius: 20px;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--primary);
+            padding: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 8px 0 var(--primary);
+        }
+
+        .letter-btn:hover:not(.disabled) {
+            background: var(--secondary);
+            transform: scale(1.08) rotate(3deg);
+            color: var(--forest);
+        }
+
+        .letter-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: scale(0.9);
+        }
+
+        .team-box {
+            background: var(--white);
+            padding: 14px 24px;
+            border-radius: 25px;
+            border: 4px solid #ddd;
+            min-width: 170px;
+            transition: 0.3s;
+            display: inline-block;
+            margin: 8px;
+        }
+
+        .team-box.active {
+            border-color: var(--accent);
+            background: var(--secondary);
+            transform: scale(1.08);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-panel {
+            font-size: 2rem;
+            font-weight: 900;
+            padding: 28px;
+            border: 6px dashed var(--primary);
+            border-radius: 30px;
+            margin: 20px 0;
+            background: #fff;
+            color: var(--forest);
+            line-height: 1.7;
+        }
+
+        .timer-track {
+            width: 100%;
+            height: 22px;
+            background: #eee;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            border: 3px solid #ddd;
+        }
+
+        #timer-progress {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
+            transition: width 1s linear;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        input {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 3px solid var(--primary);
+            border-radius: 20px;
+            text-align: center;
+            margin: 10px;
+            width: 250px;
+        }
+
+        .actions-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        @media (max-width: 900px) {
+            .start-layout {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                min-height: auto;
+            }
+
+            .abeer-side {
+                order: -1;
+            }
+
+            .start-text {
+                text-align: center;
+                padding: 0;
+            }
+
+            .start-actions {
+                justify-content: center;
+            }
+
+            .abeer-img {
+                width: 80%;
+                max-width: 340px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .question-panel {
+                font-size: 1.55rem;
+                padding: 20px;
+            }
+
+            .letter-btn {
+                font-size: 2.3rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 13px 24px;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- البداية -->
-<div id="screen-start" class="screen active">
-<div class="start-layout">
+    <canvas id="bgCanvas"></canvas>
 
-<div>
-<img src="abeer.png" class="abeer-img">
-</div>
+    <div id="ui-layer">
+        <!-- شاشة البداية -->
+        <div id="screen-start" class="screen active">
+            <div class="start-layout">
+                <div class="abeer-side">
+                    <div class="abeer-img-container">
+                        <img src="abeer.png" alt="عبير الكشفية" class="abeer-img" />
+                    </div>
+                </div>
 
-<div>
-<h1>مغامرات مس عبير</h1>
-<h2>تحدي الحروف الكشفية</h2>
-<button onclick="showScreen('screen-setup')">ابدأ المغامرة</button>
-</div>
+                <div class="start-text">
+                    <h1>مغامرات مس عبير</h1>
+                    <h2>تحدي الحروف الكشفية 🏕️</h2>
+                    <p>
+                        لعبة كشفية تفاعلية بين الفرق، فيها أسئلة صحية، تحديات ممتعة،
+                        ونظام نقاط يرفع الحماس من بداية المغامرة حتى النهاية.
+                    </p>
+                    <div class="start-actions">
+                        <button onclick="showScreen('screen-setup')">ابدأ المغامرة ←</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-</div>
-</div>
+        <!-- شاشة الإعداد -->
+        <div id="screen-setup" class="screen">
+            <h2>تجهيز الفرق الكشفية</h2>
+            <div style="margin: 20px 0;">
+                <p style="font-size: 1.4rem;">عدد الفرق المشاركة:</p>
+                <input type="number" id="num-teams" min="1" max="4" value="2" onchange="createInputs()" />
+            </div>
+            <div id="input-area" style="margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center;"></div>
 
-<!-- الإعداد -->
-<div id="screen-setup" class="screen">
-<h2>عدد الفرق</h2>
-<input id="num" type="number" value="2">
-<br>
-<button onclick="startGame()">ابدأ</button>
-<button class="end-btn" onclick="end()">إنهاء</button>
-</div>
+            <div class="actions-row">
+                <button onclick="startGame()">جاهزون للانطلاق!</button>
+                <button class="danger-btn" onclick="endCompetition()">إنهاء المسابقة</button>
+            </div>
+        </div>
 
-<!-- اللعب -->
-<div id="screen-letters" class="screen">
-<h2 id="turn-text"></h2>
-<div id="letters-grid" class="letters-grid"></div>
-<button class="end-btn" onclick="end()">إنهاء المسابقة</button>
-</div>
+        <!-- شاشة اللعب -->
+        <div id="screen-letters" class="screen">
+            <div id="status-bar"></div>
+            <h2 id="turn-text" style="margin-top: 24px; color: var(--forest);">دور فريق: ... (اختر حرفاً)</h2>
+            <div class="letters-grid" id="letters-grid"></div>
 
-<!-- السؤال -->
-<div id="screen-question" class="screen">
-<h1 id="letter"></h1>
-<h2 id="q"></h2>
-<p id="a" class="hidden"></p>
+            <div class="actions-row">
+                <button class="danger-btn" onclick="endCompetition()">إنهاء المسابقة</button>
+            </div>
+        </div>
 
-<button onclick="showAns()">إظهار الإجابة</button>
-<button onclick="handle(true)">صح</button>
-<button onclick="handle(false)">خطأ</button>
-<button class="end-btn" onclick="end()">إنهاء</button>
-</div>
+        <!-- شاشة السؤال -->
+        <div id="screen-question" class="screen">
+            <div class="timer-track"><div id="timer-progress"></div></div>
 
-<!-- النهاية -->
-<div id="screen-end" class="screen">
-<h1>النتائج</h1>
-<div id="results"></div>
-<button onclick="location.reload()">إعادة</button>
-</div>
+            <h1 id="current-letter" style="font-size: 6rem; color: var(--accent); margin-bottom: 8px;">أ</h1>
+            <div class="question-panel" id="q-text">السؤال؟</div>
+
+            <div id="ans-box" class="hidden" style="font-size: 1.8rem; color: var(--primary); margin-bottom: 22px; font-weight: bold; background: #f9fbe7; padding: 22px; border-radius: 20px; border: 3px solid var(--secondary);"></div>
+
+            <div id="q-controls" class="actions-row">
+                <button onclick="showAns()">كشف الإجابة الصحيحة 🔍</button>
+            </div>
+
+            <div id="grade-controls" class="hidden actions-row">
+                <button onclick="handleResult(true)" style="background: var(--primary);">صح ✅</button>
+                <button onclick="handleResult(false)" style="background: var(--accent);">خطأ ❌</button>
+            </div>
+
+            <div class="actions-row">
+                <button class="danger-btn" onclick="endCompetition()">إنهاء المسابقة</button>
+            </div>
+        </div>
+
+        <!-- النهاية -->
+        <div id="screen-end" class="screen">
+            <div class="abeer-img-container" style="margin-bottom: 14px;">
+                <img src="abeer.png" alt="مبروك" class="abeer-img" style="max-width: 320px;" />
+            </div>
+            <h1>مبروك للأبطال! 🏆</h1>
+            <div id="final-results" style="font-size: 2rem; margin: 24px 0; color: var(--forest);"></div>
+            <div class="actions-row">
+                <button onclick="location.reload()">لعب مسابقة جديدة 🔄</button>
+            </div>
+        </div>
+    </div>
 
 <script>
-
-const DATA=[
-{l:"أ",q:"أول خطوة بالإسعاف؟",a:"التأمين"},
-{l:"ت",q:"أول خطوة غسل اليدين؟",a:"تبليل"},
-{l:"ث",q:"تبريد الطعام؟",a:"ثلج"},
-{l:"ج",q:"إصابة الجلد؟",a:"جرح"},
-{l:"ح",q:"أدوات الإسعاف؟",a:"حقيبة"}
+const DATA = [
+    {
+        l: "أ",
+        items: [
+            { q: "أول خطوة قبل إسعاف المصاب؟", a: "التأمين" }
+        ]
+    },
+    {
+        l: "ت",
+        items: [
+            { q: "ما أول خطوة في غسل اليدين؟", a: "تبليل" },
+            { q: "ماذا نفعل للحروق؟", a: "تبريد" }
+        ]
+    },
+    {
+        l: "ث",
+        items: [
+            { q: "ما المادة التي تستخدم لحفظ الطعام بارد؟", a: "ثلج" }
+        ]
+    },
+    {
+        l: "ج",
+        items: [
+            { q: "إصابة في الجلد تحتاج تنظيف وتغطية؟", a: "جرح" }
+        ]
+    },
+    {
+        l: "ح",
+        items: [
+            { q: "أين نحفظ أدوات الإسعافات الأولية؟", a: "حقيبة" }
+        ]
+    },
+    {
+        l: "خ",
+        items: [
+            { q: "مكان إقامة الكشافة في المخيم؟", a: "خيمة" }
+        ]
+    },
+    {
+        l: "ذ",
+        items: [
+            { q: "حشرة تنقل الجراثيم للطعام؟", a: "ذباب" }
+        ]
+    },
+    {
+        l: "ر",
+        items: [
+            { q: "نزيف الأنف يسمى؟", a: "رعاف" }
+        ]
+    },
+    {
+        l: "ش",
+        items: [
+            { q: "ماذا نضع على الجرح لمنع التلوث؟", a: "شاش" }
+        ]
+    },
+    {
+        l: "ض",
+        items: [
+            { q: "ما الإجراء المستخدم لإيقاف النزيف؟", a: "ضغط" }
+        ]
+    },
+    {
+        l: "ع",
+        items: [
+            { q: "كائن سام يجب الحذر منه في المخيم؟", a: "عقرب" }
+        ]
+    },
+    {
+        l: "ن",
+        items: [
+            { q: "خروج الدم من الجسم يسمى؟", a: "نزيف" }
+        ]
+    }
 ];
 
-let teams=[];
-let turn=0;
-let used=[];
+let teams = [];
+let turn = 0;
+let used = [];
+let clock = null;
 
-function showScreen(id){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 
-function startGame(){
-teams=[{name:"فريق 1",score:0},{name:"فريق 2",score:0}];
-render();
-showScreen('screen-letters');
+window.addEventListener('resize', resize);
+resize();
+
+function drawBg() {
+    ctx.fillStyle = '#e1f5fe';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#81c784';
+    ctx.beginPath();
+    ctx.arc(canvas.width * 0.2, canvas.height + 250, 700, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#a5d6a7';
+    ctx.beginPath();
+    ctx.arc(canvas.width * 0.8, canvas.height + 200, 600, 0, Math.PI * 2);
+    ctx.fill();
+
+    requestAnimationFrame(drawBg);
+}
+drawBg();
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
 }
 
-function render(){
-document.getElementById('turn-text').innerText="دور "+teams[turn].name;
+function createInputs() {
+    const n = Number(document.getElementById('num-teams').value);
+    const area = document.getElementById('input-area');
+    area.innerHTML = '';
 
-let grid=document.getElementById('letters-grid');
-grid.innerHTML="";
+    for (let i = 1; i <= n; i++) {
+        area.innerHTML += `<input type="text" id="t-${i}" placeholder="اسم الفريق ${i}" value="الفريق ${i}">`;
+    }
+}
+createInputs();
 
-DATA.forEach((item,i)=>{
-let btn=document.createElement('div');
-btn.className="letter-btn";
-btn.innerText=item.l;
-btn.onclick=()=>ask(i);
-grid.appendChild(btn);
-});
+function startGame() {
+    const n = Number(document.getElementById('num-teams').value);
+    teams = [];
+
+    for (let i = 1; i <= n; i++) {
+        const input = document.getElementById('t-' + i);
+        const name = input && input.value.trim() ? input.value.trim() : ('الفريق ' + i);
+        teams.push({ name, score: 0 });
+    }
+
+    used = [];
+    turn = 0;
+    render();
+    showScreen('screen-letters');
 }
 
-function ask(i){
-let item=DATA[i];
-document.getElementById('letter').innerText=item.l;
-document.getElementById('q').innerText=item.q;
-document.getElementById('a').innerText=item.a;
-document.getElementById('a').classList.add('hidden');
-showScreen('screen-question');
+function render() {
+    const bar = document.getElementById('status-bar');
+    bar.innerHTML = '';
+
+    teams.forEach((t, i) => {
+        bar.innerHTML += `
+            <div class="team-box ${i === turn ? 'active' : ''}">
+                <b>${t.name}</b><br>${t.score} نقطة
+            </div>
+        `;
+    });
+
+    document.getElementById('turn-text').innerText = 'الآن دور: ' + teams[turn].name + ' (اختر حرفاً)';
+
+    const grid = document.getElementById('letters-grid');
+    grid.innerHTML = '';
+
+    DATA.forEach((item, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'letter-btn' + (used.includes(idx) ? ' disabled' : '');
+        btn.innerText = item.l;
+
+        if (!used.includes(idx)) {
+            btn.onclick = () => ask(idx);
+        }
+
+        grid.appendChild(btn);
+    });
 }
 
-function showAns(){
-document.getElementById('a').classList.remove('hidden');
+function ask(idx) {
+    used.push(idx);
+    const item = DATA[idx];
+    const randomQuestion = item.items[Math.floor(Math.random() * item.items.length)];
+
+    document.getElementById('current-letter').innerText = item.l;
+    document.getElementById('q-text').innerText = randomQuestion.q;
+    document.getElementById('ans-box').innerText = 'الإجابة الصحيحة: ' + randomQuestion.a;
+
+    document.getElementById('ans-box').classList.add('hidden');
+    document.getElementById('q-controls').classList.remove('hidden');
+    document.getElementById('grade-controls').classList.add('hidden');
+
+    showScreen('screen-question');
+
+    let time = 20;
+    const bar = document.getElementById('timer-progress');
+    bar.style.width = '100%';
+
+    clearInterval(clock);
+    clock = setInterval(() => {
+        time--;
+        bar.style.width = (time / 20) * 100 + '%';
+
+        if (time <= 0) {
+            clearInterval(clock);
+            showAns();
+        }
+    }, 1000);
 }
 
-function handle(ok){
-if(ok) teams[turn].score+=10;
-turn=(turn+1)%teams.length;
-render();
-showScreen('screen-letters');
+function showAns() {
+    clearInterval(clock);
+    document.getElementById('ans-box').classList.remove('hidden');
+    document.getElementById('q-controls').classList.add('hidden');
+    document.getElementById('grade-controls').classList.remove('hidden');
 }
 
-function end(){
-showScreen('screen-end');
-let html="";
-teams.forEach(t=>{
-html+=t.name+" : "+t.score+" نقطة<br>";
-});
-document.getElementById('results').innerHTML=html;
+function handleResult(isWin) {
+    if (isWin) {
+        teams[turn].score += 10;
+    }
+
+    turn = (turn + 1) % teams.length;
+
+    if (used.length === DATA.length) {
+        endCompetition();
+    } else {
+        render();
+        showScreen('screen-letters');
+    }
 }
 
+function endCompetition() {
+    clearInterval(clock);
+    showScreen('screen-end');
+
+    const sorted = [...teams].sort((a, b) => b.score - a.score);
+
+    document.getElementById('final-results').innerHTML = sorted.map((t, idx) => `
+        <p style="font-weight:${idx === 0 ? '900' : 'normal'}; color:${idx === 0 ? 'var(--accent)' : 'var(--forest)'}">
+            ${idx === 0 ? '🥇 ' : ''}${t.name}: ${t.score} نقطة
+        </p>
+    `).join('');
+}
 </script>
-
 </body>
 </html>
