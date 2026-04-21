@@ -442,11 +442,16 @@
         requestAnimationFrame(drawBg);
     }
     drawBg();
+function showScreen(id) {
+    // يخفي شاشة البداية
+    document.getElementById('screen-start').classList.remove('active');
 
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
+    // يخفي باقي الشاشات
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+    // يظهر الشاشة المطلوبة
+    document.getElementById(id).classList.add('active');
+}
 
     function createInputs() {
         const n = document.getElementById('num-teams').value;
